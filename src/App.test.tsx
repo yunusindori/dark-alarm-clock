@@ -29,5 +29,17 @@ describe('App', () => {
     await user.click(screen.getByText('Alarm 2'))
 
     expect(screen.getByLabelText('Alarm settings: Alarm 2')).toBeInTheDocument()
+
+    // Change label in draft
+    const labelInput = screen.getByPlaceholderText('Morning')
+    await user.clear(labelInput)
+    await user.type(labelInput, 'Office')
+
+    // Without saving, list should still show the old saved label
+    expect(screen.getByText('Alarm 2')).toBeInTheDocument()
+
+    // Save and verify list updates
+    await user.click(screen.getByRole('button', { name: 'Save / Apply' }))
+    expect(screen.getByText('Office')).toBeInTheDocument()
   })
 })

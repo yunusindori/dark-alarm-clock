@@ -5,12 +5,29 @@ A simple React alarm clock with a low-glare dark theme.
 ## Features
 
 - Live clock + date
-- Set an alarm time (HH:MM)
-- Select a tone (synthesized via Web Audio)
+- Multiple alarms
+  - Add/remove alarms
+  - Select an alarm to edit
+- Time picker with rolling inputs
+  - Type values or use mouse wheel/spinner arrows for hour/minute
+- Per-alarm schedule
+  - Select days of week (with quick presets: Weekdays / Weekend / Every day)
+- Tone selection (synthesized via Web Audio)
 - Choose how long to play the tone (10s / 30s / 60s / 2m / until stopped)
 - Snooze (3–15 minutes)
-- Test tone button (helps satisfy browser “user gesture” audio requirement)
-- Persists settings in `localStorage`
+  - Snoozed status is shown in the alarm list
+  - You can stop a snoozed alarm from the list
+- Settings persist in `localStorage`
+
+## Important: Save / Apply workflow
+
+Edits in the alarm editor are **not persisted immediately**.
+
+- Make changes in the editor (this is a local draft)
+- Click **Save / Apply** to store the changes to `localStorage`
+- Click **Cancel** to discard draft changes and revert to the last saved state
+
+This prevents inadvertent changes.
 
 ## Run locally
 

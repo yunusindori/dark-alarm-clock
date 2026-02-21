@@ -11,6 +11,9 @@ export type AlarmFormProps = {
   onTestTone: () => void
   onStopTest: () => void
   isRinging: boolean
+  isDirty: boolean
+  onSave: () => void
+  onCancel: () => void
 }
 
 const DURATION_OPTIONS: Array<{ label: string; value: AlarmConfig['playDurationSec'] }> = [
@@ -23,7 +26,17 @@ const DURATION_OPTIONS: Array<{ label: string; value: AlarmConfig['playDurationS
 
 const SNOOZE_OPTIONS_MIN = [3, 5, 7, 10, 15]
 
-export function AlarmForm({ config, onChange, onRemove, onTestTone, onStopTest, isRinging }: AlarmFormProps) {
+export function AlarmForm({
+  config,
+  onChange,
+  onRemove,
+  onTestTone,
+  onStopTest,
+  isRinging,
+  isDirty,
+  onSave,
+  onCancel,
+}: AlarmFormProps) {
   return (
     <section className="card" aria-label={`Alarm settings: ${config.label}`}>
       <div className="row row--split">
@@ -120,8 +133,14 @@ export function AlarmForm({ config, onChange, onRemove, onTestTone, onStopTest, 
         </div>
       </div>
 
-      <div className="row" style={{ marginTop: 12, justifyContent: 'space-between' }}>
-        <div className="row">
+      <div className="row" style={{ marginTop: 12, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div className="row" style={{ flexWrap: 'wrap' }}>
+          <button type="button" className="btn btn--primary" onClick={onSave} disabled={!isDirty || isRinging}>
+            Save / Apply
+          </button>
+          <button type="button" className="btn btn--ghost" onClick={onCancel} disabled={!isDirty || isRinging}>
+            Cancel
+          </button>
           <button type="button" className="btn" onClick={onTestTone} disabled={isRinging}>
             Test tone
           </button>
@@ -135,9 +154,15 @@ export function AlarmForm({ config, onChange, onRemove, onTestTone, onStopTest, 
         </button>
       </div>
 
-      <div className="muted" style={{ marginTop: 10 }}>
-        Tip: browsers require interaction before audio can play. Use “Test tone” once after loading the page.
-      </div>
+      {isDirty ? (
+        <div className="muted" style={{ marginTop: 10 }}>
+          You have unsaved changes.
+        </div>
+      ) : (
+        <div className="muted" style={{ marginTop: 10 }}>
+          Tip: browsers require interaction before audio can play. Use “Test tone” once after loading the page.
+        </div>
+      )}
     </section>
   )
 }

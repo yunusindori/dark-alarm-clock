@@ -28,6 +28,17 @@ function App() {
   }, [alarms, selectedAlarmId, setSelectedAlarmId])
 
   const selectedAlarm = useMemo(() => alarms.find((a) => a.config.id === selectedAlarmId) ?? null, [alarms, selectedAlarmId])
+  // Draft editor state (not persisted). Resets when selected alarm changes.
+  const [draftConfig, setDraftConfig] = useState<AlarmConfig | null>(selectedAlarm ? selectedAlarm.config : null)
+
+  // Ensure draft stays in sync when selection changes by resetting via key on AlarmForm below.
+  const draftKey = selectedAlarm?.config.id ?? 'none'
+
+  const isDirty = useMemo(() => {
+    if (!selectedAlarm || !draftConfig) return false
+    return JSON.stringify(selectedAlarm.config) !== JSON.stringify(draftConfig)
+  }, [selectedAlarm, draftConfig])
+
   const ringingAlarm = useMemo(() => alarms.find((a) => a.config.id === ringingAlarmId) ?? null, [alarms, ringingAlarmId])
 
   const enabledCount = useMemo(() => alarms.filter((a) => a.config.enabled).length, [alarms])
@@ -113,11 +124,34 @@ function App() {
     [setAlarms],
   )
 
+  const saveDraft = useCallback(() => {
+    if (!selectedAlarm || !draftConfig) return
+    updateAlarmConfig(selectedAlarm.config.id, draftConfig)
+  }, [selectedAlarm, draftConfig, updateAlarmConfig])
+
+  const cancelDraft = useCallback(() => {
+    if (!selectedAlarm) {
+      setDraftConfig(null)
+      return
+    }
+    setDraftConfig(selectedAlarm.config)
+  }, [selectedAlarm])
+
+  const selectAlarm = useCallback(
+    (id: AlarmId) => {
+      setSelectedAlarmId(id)
+      const saved = alarms.find((a) => a.config.id === id)
+      if (saved) setDraftConfig(saved.config)
+    },
+    [alarms, setSelectedAlarmId],
+  )
+
   const addAlarm = useCallback(() => {
     const nextIndex = alarms.length + 1
     const a = createDefaultAlarm({ label: `Alarm ${nextIndex}` })
     setAlarms((prev) => [...prev, a])
     setSelectedAlarmId(a.config.id)
+    setDraftConfig(a.config)
   }, [alarms.length, setAlarms, setSelectedAlarmId])
 
   const removeAlarm = useCallback(
@@ -213,8 +247,12 @@ function App() {
           <div className="bottomRow">
             {selectedAlarm ? (
               <AlarmForm
-                config={selectedAlarm.config}
-                onChange={(next) => updateAlarmConfig(selectedAlarm.config.id, next)}
+                key={draftKey}
+                config={draftConfig ?? selectedAlarm.config}
+                onChange={setDraftConfig}
+                onSave={saveDraft}
+                onCancel={cancelDraft}
+                isDirty={isDirty}
                 onRemove={() => removeAlarm(selectedAlarm.config.id)}
                 onTestTone={onTestTone}
                 onStopTest={onStopTest}
@@ -254,7 +292,7 @@ function App() {
                           gap: 6,
                           minWidth: 170,
                         }}
-                        onClick={() => setSelectedAlarmId(a.config.id)}
+                        onClick={() => selectAlarm(a.config.id)}
                       >
                         <div className="row" style={{ justifyContent: 'space-between', width: '100%' }}>
                           <span className="mono">{String(a.config.label || 'Alarm')}</span>
