@@ -1,6 +1,8 @@
 # Dark Alarm Clock (React)
 
-A simple React alarm clock with a low-glare dark theme.
+A simple React alarm clock with a low-glare dark theme, for the ones who tend to fall asleep at their desk.
+
+https://yunusindori.github.io/dark-alarm-clock/
 
 ## Features
 
