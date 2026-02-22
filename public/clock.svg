@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="32" height="32"
+     viewBox="0 0 256 256"
+     aria-hidden="true">
+
+    <defs>
+        <!-- Body gradient -->
+        <linearGradient id="alarmBody" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#41D1FF"/>
+            <stop offset="100%" stop-color="#BD34FE"/>
+        </linearGradient>
+
+        <!-- Bell gradient -->
+        <linearGradient id="alarmBell" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFEA83"/>
+            <stop offset="100%" stop-color="#FFA800"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Left Bell -->
+    <path fill="url(#alarmBell)"
+          d="M55 60
+           a40 40 0 0 1 60 -20
+           a35 35 0 0 0 -60 20z"/>
+
+    <!-- Right Bell -->
+    <path fill="url(#alarmBell)"
+          d="M201 60
+           a40 40 0 0 0 -60 -20
+           a35 35 0 0 1 60 20z"/>
+
+    <!-- Clock Body -->
+    <circle cx="128" cy="140" r="85" fill="url(#alarmBody)"/>
+
+    <!-- Clock Face -->
+    <circle cx="128" cy="140" r="65" fill="#ffffff"/>
+
+    <!-- Hour Hand -->
+    <rect x="123" y="110" width="10" height="35" rx="5" fill="#BD34FE"/>
+
+    <!-- Minute Hand -->
+    <rect x="128" y="135" width="45" height="8" rx="4" fill="#41D1FF"/>
+
+    <!-- Center Pin -->
+    <circle cx="128" cy="140" r="6" fill="#FFA800"/>
+
+    <!-- Left Leg -->
+    <rect x="80" y="215" width="20" height="25" rx="5" fill="url(#alarmBody)"/>
+
+    <!-- Right Leg -->
+    <rect x="156" y="215" width="20" height="25" rx="5" fill="url(#alarmBody)"/>
+
+</svg>
