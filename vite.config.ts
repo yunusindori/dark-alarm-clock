@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/dark-alarm-clock/',
   plugins: [react()],
+  build: {
+    outDir: 'docs',
+    emptyOutDir: false,
+  },
   server: {
     port: 7000, // Change to your desired port number (e.g., 8080, 3000)
     host: true, // Set to true to listen on all addresses, including LAN and public addresses
