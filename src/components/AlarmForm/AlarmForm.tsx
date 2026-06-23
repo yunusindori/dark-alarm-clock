@@ -37,6 +37,8 @@ export function AlarmForm({
   onSave,
   onCancel,
 }: AlarmFormProps) {
+  const isPresetSnooze = SNOOZE_OPTIONS_MIN.includes(config.snoozeMinutes)
+
   return (
     <section className="card" aria-label={`Alarm settings: ${config.label}`}>
       <div className="row row--split">
@@ -105,15 +107,35 @@ export function AlarmForm({
           <span className="field__label">Snooze</span>
           <select
             className="select--compact"
-            value={String(config.snoozeMinutes)}
-            onChange={(e) => onChange({ ...config, snoozeMinutes: Number(e.target.value) })}
+            value={isPresetSnooze ? String(config.snoozeMinutes) : 'custom'}
+            onChange={(e) => {
+              const v = e.target.value
+              if (v === 'custom') return
+              onChange({ ...config, snoozeMinutes: Number(v) })
+            }}
           >
             {SNOOZE_OPTIONS_MIN.map((m) => (
               <option key={m} value={m}>
                 {m} minutes
               </option>
             ))}
+            <option value="custom">Custom (set below)</option>
           </select>
+          <input
+            className="input--compact"
+            type="number"
+            min={1}
+            step={1}
+            value={config.snoozeMinutes}
+            onChange={(e) => {
+              const raw = e.target.value
+              if (raw === '') return
+              const next = Number(raw)
+              if (!Number.isFinite(next)) return
+              onChange({ ...config, snoozeMinutes: Math.max(1, Math.floor(next)) })
+            }}
+            aria-label="Custom snooze minutes"
+          />
         </label>
 
         <div className="field">
