@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { computeNextDueAlarm } from '../useMultiAlarmScheduler'
+import { renderHook } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { computeNextDueAlarm, useMultiAlarmScheduler } from '../useMultiAlarmScheduler'
 import type { Alarm } from '../../state/alarms'
 import { everyDay } from '../../state/alarms'
 
@@ -42,5 +43,30 @@ describe('computeNextDueAlarm', () => {
 
     const due = computeNextDueAlarm(now, [a])
     expect(due?.dueAtMs).toBe(a.runtime.snoozeUntilMs)
+  })
+})
+
+describe('useMultiAlarmScheduler', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('rings when the clock tick and alarm deadline occur together', () => {
+    vi.useFakeTimers()
+    const beforeDue = new Date('2026-02-20T08:59:59')
+    const atDue = new Date('2026-02-20T09:00:00')
+    const onRing = vi.fn()
+    const alarms = [alarm('a', true, 9, 0)]
+
+    vi.setSystemTime(beforeDue)
+    const { rerender } = renderHook(
+      ({ now }) => useMultiAlarmScheduler(now, alarms, onRing),
+      { initialProps: { now: beforeDue } },
+    )
+
+    vi.setSystemTime(atDue)
+    rerender({ now: atDue })
+
+    expect(onRing).toHaveBeenCalledWith('a')
   })
 })

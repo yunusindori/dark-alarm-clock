@@ -51,26 +51,44 @@ export function computeNextDueAlarm(now: Date, alarms: Alarm[]): DueAlarm | null
 export function useMultiAlarmScheduler(now: Date, alarms: Alarm[], onRing: (alarmId: string) => void) {
   const due = useMemo(() => computeNextDueAlarm(now, alarms), [now, alarms])
   const timerRef = useRef<number | null>(null)
+  const scheduledDueRef = useRef<DueAlarm | null>(null)
 
   useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    const scheduled = scheduledDueRef.current
+
+    // The clock tick can run at the same instant as the alarm timer. Trigger
+    // the already-scheduled alarm rather than replacing it with tomorrow's one.
+    if (scheduled && scheduled.dueAtMs <= Date.now()) {
+      const alarmId = scheduled.alarmId
+      if (timerRef.current) window.clearTimeout(timerRef.current)
+      timerRef.current = null
+      scheduledDueRef.current = null
+      onRing(alarmId)
+      return
+    }
+
+    if (scheduled && due && scheduled.alarmId === due.alarmId && scheduled.dueAtMs === due.dueAtMs) return
+
     if (timerRef.current) {
       window.clearTimeout(timerRef.current)
       timerRef.current = null
     }
 
+    scheduledDueRef.current = due
     if (!due) return
 
     const delay = Math.max(0, due.dueAtMs - Date.now())
     timerRef.current = window.setTimeout(() => {
+      timerRef.current = null
+      scheduledDueRef.current = null
       onRing(due.alarmId)
     }, delay)
-
-    return () => {
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
-    }
   }, [due, onRing])
 
   return { nextDue: due }
