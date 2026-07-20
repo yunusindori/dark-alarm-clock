@@ -12,8 +12,12 @@ function normalizeRuntime(raw: unknown, enabled: boolean): AlarmRuntime {
   const status = raw.status
   const snoozeUntilMs = raw.snoozeUntilMs
 
+  // Ringing cannot survive a reload: the modal and audio engine are in-memory.
+  // Recover an interrupted alarm so it can be scheduled again.
+  if (status === 'ringing') return base
+
   const nextStatus: AlarmRuntime['status'] =
-    status === 'ringing' || status === 'snoozed' || status === 'armed' || status === 'idle'
+    status === 'snoozed' || status === 'armed' || status === 'idle'
       ? status
       : base.status
 
@@ -90,4 +94,3 @@ export function normalizeAlarms(raw: unknown): Alarm[] {
 
   return out.length ? out : [createDefaultAlarm({ label: 'Alarm 1', days: everyDay() })]
 }
-
